@@ -7,9 +7,10 @@ import time
 
 import config as _conf
 from config import *
+from geneSimClasses import *
 
 def checkCollision(newNode, existingNodes, nodeSize):
-    sizeSquared = nodeSize**2 #avoid performing the same calculaion repeatedly!
+    sizeSquared = nodeSize**2 #avoid performing the same calculation repeatedly!
     for node in existingNodes:
         if (((newNode[0]-node[0])**2 + (newNode[1]-node[1])**2 + (newNode[2]-node[2])**2) < sizeSquared):
             print "collision averted"
@@ -36,7 +37,7 @@ def placeBindSites(bindSites, clusters=False, cSize=0, cProbability=0):
             rand = numpy.random.uniform(0,1)
             if (rand <= cProbability): #we place this one in a cluster!
                 placed = 0
-                while (placed==0): #place them in the cube of the cluster (maybe I should make this a sphere in the future)
+                while (placed==0):
                     bindSites[i][0] = clusterX + numpy.random.uniform(-clusterSize/2.0,+clusterSize/2.0)
                     bindSites[i][1] = clusterY + numpy.random.uniform(-clusterSize/2.0,+clusterSize/2.0)
                     bindSites[i][2] = clusterZ + numpy.random.uniform(-clusterSize/2.0,+clusterSize/2.0)
@@ -45,11 +46,15 @@ def placeBindSites(bindSites, clusters=False, cSize=0, cProbability=0):
                     if not checkCollision(bindSites[i],bindSites[0:i],bindSize):
                         placed=1
             else:
-                bindSites[i][0] = numpy.random.uniform(-maxX + TFsize/2.0,maxX-TFsize/2.0)
-                bindSites[i][1] = numpy.random.uniform(-maxY+TFsize/2.0,maxY-TFsize/2.0)
-                bindSites[i][2] = numpy.random.uniform(-maxZ+TFsize/2.0,maxZ-TFsize/2.0)
-                bindSites[i][3] = -1 #all initially unbound
-                bindSites[i][4] = False #in a cluster
+                placed = 0
+                while (placed==0):
+                    bindSites[i][0] = numpy.random.uniform(-maxX + TFsize/2.0,maxX-TFsize/2.0)
+                    bindSites[i][1] = numpy.random.uniform(-maxY+TFsize/2.0,maxY-TFsize/2.0)
+                    bindSites[i][2] = numpy.random.uniform(-maxZ+TFsize/2.0,maxZ-TFsize/2.0)
+                    bindSites[i][3] = -1 #all initially unbound
+                    bindSites[i][4] = False #NOT in a cluster
+                    if not checkCollision(bindSites[i],bindSites[0:i],bindSize):
+                        placed=1
             i+=1
         return (clusterX,clusterY,clusterZ)
     return
@@ -238,7 +243,7 @@ def writeSiteStatus(time,site, c = True): # c is False for the non-cluster site,
     return
 
 def printStatus(time, verbose=False):
-    print "System simulation %.2f%% complete (t=%d) " % ((float(time)/duration), time)
+    print "System simulation %.2f%% complete (t=%d) " % (((100.*time)/duration), time)
     if (verbose):
         print "\n TF Info:"
         for tf in TFarray:
