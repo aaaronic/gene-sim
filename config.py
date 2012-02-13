@@ -15,7 +15,7 @@ delta_t       = 1000 # (micro-seconds)
 ## Duration of the simulation
 duration      = 600000 * delta_t # (either multiply delta_t or set a raw time - in microseconds)
 #how often should we print out the current system status?
-printOutAt    = 10000 #(a raw number of timesteps into the simulation)
+printOutAt    = duration / (delta_t * 100) #(a raw number of timesteps into the simulation)
 #how often should we wite the system status to a file?
 writeSysOutAt = 100 #(a raw number of timesteps into the simulation)
 #Prefix of the names of the files to output to (the timestamp of the run will also be included as a suffix)
@@ -32,15 +32,17 @@ systemHeight  = 1000 # z-axis (nm)
 TFsize       = 10/3.0 # (nm)
 ## The TF Diffusion Coefficient describes the scale of the random, Brownian
 ## movement exhibited by TF molecules.
-TFdiffusionC = 10000 # (nm^2/s)
-TFnumberInit = 10 # This is the number of TF molecules at system start
+TFdiffusionC = 100 # (nm^2/s) this number and delta_t need to be set reasonably,
+                     # so that collisions aren't very unlikely due to large displacements per timestep
+                     # the mean displacement per timestep is (6*diff_C*delta_t)**0.5
+TFnumberInit = 1000 # This is the number of TF molecules at system start
 
 
 # Binding Site Parameters
 ## This value is the size of binding sites; if they are cubes, this is the
 ## side length, and if they are spheres, this is their diameter.
 bindSize     = 10 # (nm)
-bindSizeSquared = bindSize**2 #for expediency of the simulation
+bindDistanceSquared = (bindSize+TFsize)**2 #for expediency of the simulation
 ## Probability of binding for a TF which within the volume of the binding site
 ## during a single time-step of the system.
 pBind        = 1  # absolute probability [0,1]

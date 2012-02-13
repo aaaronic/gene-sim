@@ -65,7 +65,7 @@ def placeTFs(tfs, size):
     return
 
 def checkDiffusionCollision(node, allNodes, allNodesPrev):
-    #do nothing here now, yet... maybe never at all, since collisions are kind of irrevelant
+    #do nothing here now, yet... maybe never at all, since collisions between TFs are kind of irrevelant
     return
 
 def diffuseTFs(TFs,TFsPrev,bindSites,dt,diffC):
@@ -154,9 +154,9 @@ def checkTFsiteCollision(tf,bindSites):
     while (i<len(bindSites)):
         if (bindSitesPosn[siteNum][3] != -1): # ensure only unbound sites are considered for binding
             distSquared = (bindSites[i][0] - tf[0])**2 + (bindSites[i][1] - tf[1])**2 + (bindSites[i][2] - tf[2])**2
-            if (distSquared <= bindSizeSquared):
+            if (distSquared <= bindDistanceSquared):
                 return i
-                i+=1
+        i+=1
     return -1 #no collision
 
 def calcGlobalStats():
@@ -238,7 +238,7 @@ def writeSiteStatus(time,site, c = True): # c is False for the non-cluster site,
     return
 
 def printStatus(time, verbose=False):
-    print "System currently at time " + str(time) + "mu-s of total " + str(duration)
+    print "System simulation %.2f%% complete (t=%d) " % ((float(time)/duration), time)
     if (verbose):
         print "\n TF Info:"
         for tf in TFarray:
@@ -256,7 +256,7 @@ def writeConfig(f):
 
 def runSimulation():
     global t
-    iteration = 0
+    iteration = 0    
     
     while (t < duration):
         if (iteration % printOutAt == 0):
