@@ -73,44 +73,61 @@ def checkDiffusionCollision(node, allNodes, allNodesPrev):
     #do nothing here now, yet... maybe never at all, since collisions between TFs are kind of irrevelant
     return
 
-def diffuseTFs(TFs,TFsPrev,bindSites,dt,diffC):
+def diffuseTFs(TFs,bindSites,dt,diffC):
     #treating each dimension as a gaussian probability of movement, with sigma = (2Dt)^.5
     sigma = (2*dt*(10**-6)*diffC)**.5 #The 10^-6 is due to dt being in _microseconds_
+    
+    #avoid a lot of menial, repetitive calculations just for comparison purposes
+    maxXminusHalfSize = maxX - TFsize/2.0
+    minXplusHalfSize = -maxX + TFsize/2.0
+    maxYminusHalfSize = maxY - TFsize/2.0
+    minYplusHalfSize = -maxY + TFsize/2.0
+    maxZminusHalfSize = maxZ - TFsize/2.0
+    minZplusHalfSize = -maxZ + TFsize/2.0
+
+    degreesOfFreedom = 3*len(TFs)    
+    
+    randArr = numpy.random.normal(0,sigma,3*len(TFs))
+    
     i=0
-    while (i<len(TFs)):
-        if (TFs[i][3] == -1): #only currently unbound elements may move!
-            randArr = numpy.random.normal(0,sigma,3)
-            TFs[i][0] += randArr[0]
-            if (TFs[i][0] > (maxX - TFsize/2.0)): #prevent leaving the box!
-                TFs[i][0] = 2.0*(maxX - TFsize/2.0) - TFs[i][0]
-            if (TFs[i][0] < (-maxX + TFsize/2.0)): #prevent leaving the box!
-                TFs[i][0] = 2.0*(-maxX + TFsize/2.0) - TFs[i][0]
-            TFs[i][1] += randArr[1]
-            if (TFs[i][1] > (maxY - TFsize/2.0)): #prevent leaving the box!
-                TFs[i][1] = 2.0*(maxY - TFsize/2.0) - TFs[i][1]
-            if (TFs[i][1] < (-maxY + TFsize/2.0)): #prevent leaving the box!
-                TFs[i][1] = 2.0*(-maxY + TFsize/2.0) - TFs[i][1]
-            TFs[i][2] += randArr[2]
-            if (TFs[i][2] > (maxZ - TFsize/2.0)): #prevent leaving the box!
-                TFs[i][2] = 2.0*(maxZ - TFsize/2.0) - TFs[i][2]
-            if (TFs[i][2] < (-maxZ + TFsize/2.0)): #prevent leaving the box!
-                TFs[i][2] = 2.0*(-maxZ + TFsize/2.0) - TFs[i][2]
-        i+=1
+    tf=0
+    while (i<degreesOfFreedom):
+        if (TFs[tf][3] == -1): #only currently unbound elements may move!
+            TFs[tf][0] += randArr[i]
+            if (TFs[tf][0] > maxXminusHalfSize): #prevent leaving the box!
+                TFs[tf][0] = 2.0*maxXminusHalfSize - TFs[tf][0]
+            if (TFs[tf][0] < minXplusHalfSize): #prevent leaving the box!
+                TFs[tf][0] = 2.0*minXplusHalfSize - TFs[tf][0]
+            TFs[tf][1] += randArr[i+1]
+            if (TFs[tf][1] > maxYminusHalfSize): #prevent leaving the box!
+                TFs[tf][1] = 2.0*maxYminusHalfSize - TFs[tf][1]
+            if (TFs[tf][1] < minYplusHalfSize): #prevent leaving the box!
+                TFs[tf][1] = 2.0*minYplusHalfSize - TFs[tf][1]
+            TFs[tf][2] += randArr[i+2]
+            if (TFs[tf][2] > maxZminusHalfSize): #prevent leaving the box!
+                TFs[tf][2] = 2.0*maxZminusHalfSize - TFs[tf][2]
+            if (TFs[tf][2] < minZplusHalfSize): #prevent leaving the box!
+                TFs[tf][2] = 2.0*minZplusHalfSize - TFs[tf][2]
+        i+=3
+        tf+=1
     return
     
 def iterate():
-    TFarrayPrev = TFarray.copy()
+    #TFarrayPrev = TFarray.copy() #dont think we need to know this at all, currently
     TFunbind()
-    diffuseTFs(TFarray,TFarrayPrev,bindSitesPosn,delta_t,TFdiffusionC)
+    diffuseTFs(TFarray,bindSitesPosn,delta_t,TFdiffusionC)
     TFbind()
     return
     
 def TFunbind(): #allow TFs to become unbound based on their probability of doing so
     i=0
-    while (i<len(TFarray)):
+    
+    numTFs = len(TFarray)
+    c = numpy.random.uniform(0.0,1.0, numTFs)
+    
+    while (i<numTFs):
         if (TFarray[i][3] !=-1 ):
-            c = numpy.random.uniform(0.0,1.0)
-            if (c <= pUnbind):
+            if (c[i] <= pUnbind):
                 bindSitesPosn[TFarray[i][3]][3] = -1 #unbind site
                 siteNum = TFarray[i][3]
                 TFarray[i][3] = -1 #unbind TF
@@ -305,7 +322,6 @@ try:
     if (clusterPosn):
         systemFileOut.write("# Cluster centered at: " + str(clusterPosn) + "\n\n")
     placeTFs(TFarray,TFsize)
-    TFarrayPrev = TFarray.copy()
 
     unclusteredSites = filter(lambda x: x[4] == False, bindSitesPosn)
     uSitesNum = len(unclusteredSites)    
@@ -318,7 +334,7 @@ try:
     print "Binding Sites are fixed at the following locations:"
     systemFileOut.write("# Binding Sites are fixed at the following locations:\n")
     for site in bindSitesPosn:
-        print site
+        print site[0:3]
         systemFileOut.write("# " + str(site) + "\n")
     systemFileOut.write("\n\n")
     print "\n TFs are initially located here:"
