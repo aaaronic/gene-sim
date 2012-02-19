@@ -116,7 +116,6 @@ def iterate():
     #TFarrayPrev = TFarray.copy() #dont think we need to know this at all, currently
     TFunbind()
     unBoundTFs = filter(lambda x: x[3] == -1, TFarray)
-    return
     diffuseTFs(unBoundTFs,delta_t,TFdiffusionC)
     TFbind(unBoundTFs)
     return
