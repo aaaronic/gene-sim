@@ -1,4 +1,3 @@
-
 #Perform some initial setup
 import numpy
 import scipy
@@ -76,7 +75,7 @@ def checkDiffusionCollision(node, allNodes, allNodesPrev):
 def diffuseTFs(TFs,bindSites,dt,diffC):
     #treating each dimension as a gaussian probability of movement, with sigma = (2Dt)^.5
     sigma = (2*dt*(10**-6)*diffC)**.5 #The 10^-6 is due to dt being in _microseconds_
-    
+
     #avoid a lot of menial, repetitive calculations just for comparison purposes
     maxXminusHalfSize = maxX - TFsize/2.0
     minXplusHalfSize = -maxX + TFsize/2.0
@@ -85,10 +84,10 @@ def diffuseTFs(TFs,bindSites,dt,diffC):
     maxZminusHalfSize = maxZ - TFsize/2.0
     minZplusHalfSize = -maxZ + TFsize/2.0
 
-    degreesOfFreedom = 3*len(TFs)    
-    
+    degreesOfFreedom = 3*len(TFs)
+
     randArr = numpy.random.normal(0,sigma,3*len(TFs))
-    
+
     i=0
     tf=0
     while (i<degreesOfFreedom):
@@ -111,7 +110,7 @@ def diffuseTFs(TFs,bindSites,dt,diffC):
         i+=3
         tf+=1
     return
-    
+
 def iterate():
     global TFarray
     #TFarrayPrev = TFarray.copy() #dont think we need to know this at all, currently
@@ -120,13 +119,13 @@ def iterate():
     diffuseTFs(unBoundTFs,bindSitesPosn,delta_t,TFdiffusionC)
     TFbind(unBoundTFs)
     return
-    
+
 def TFunbind(): #allow TFs to become unbound based on their probability of doing so
     i=0
-    
+
     numTFs = len(TFarray)
     c = numpy.random.uniform(0.0,1.0, numTFs)
-    
+
     while (i<numTFs):
         if (TFarray[i][3] !=-1 ):
             if (c[i] <= pUnbind):
@@ -168,7 +167,7 @@ def TFbind(tfs):
                 else:
                     if (siteNum == siteToTrack):
                         writeSiteStatus(t + delta_t , siteNum)
-                        
+
         i+=1
     return
 
@@ -279,8 +278,8 @@ def writeConfig(f):
 
 def runSimulation():
     global t
-    iteration = 0    
-    
+    iteration = 0
+
     while (t < duration):
         if (iteration % printOutAt == 0):
             printStatus(t, False)
@@ -325,13 +324,13 @@ try:
     placeTFs(TFarray,TFsize)
 
     unclusteredSites = filter(lambda x: x[4] == False, bindSitesPosn)
-    uSitesNum = len(unclusteredSites)    
-    
+    uSitesNum = len(unclusteredSites)
+
     print "TF's and Binding Sites now in place."
 
     if (clustering):
         print "Cluster centered at: " + str(clusterPosn) + "\n"
-    
+
     print "Binding Sites are fixed at the following locations:"
     systemFileOut.write("# Binding Sites are fixed at the following locations:\n")
     for site in bindSitesPosn:
@@ -359,7 +358,7 @@ try:
         siteToTrack = numpy.random.randint(len(bindSitesPosn))
         writeSiteStatus(0, siteToTrack)
 
-    
+
     runSimulation()
 finally: #this way the files are closed even if an error is encountered
     systemFileOut.close()
