@@ -113,10 +113,12 @@ def diffuseTFs(TFs,bindSites,dt,diffC):
     return
     
 def iterate():
+    global TFarray
     #TFarrayPrev = TFarray.copy() #dont think we need to know this at all, currently
     TFunbind()
-    diffuseTFs(TFarray,bindSitesPosn,delta_t,TFdiffusionC)
-    TFbind()
+    unBoundTFs = filter(lambda x: x[3] != -1, TFarray)
+    diffuseTFs(unBoundTFs,bindSitesPosn,delta_t,TFdiffusionC)
+    TFbind(unBoundTFs)
     return
     
 def TFunbind(): #allow TFs to become unbound based on their probability of doing so
@@ -145,28 +147,27 @@ def TFunbind(): #allow TFs to become unbound based on their probability of doing
         i+=1
     return
 
-def TFbind():
+def TFbind(tfs):
     i=0
-    unboundSites = filter(lambda x: x[3] != -1, bindSitesPosn)
-    while (i<len(TFarray)):
-        if (TFarray[i][3] == -1 ):
-            siteNum = checkTFsiteCollision(TFarray[i],unboundSites)
-            if (siteNum != -1):
-                c = numpy.random.uniform(0.0,1.0)
-                if (c <= pBind):
-                    bindSitesPosn[siteNum][3] = i #bind site
-                    TFarray[i][3] = siteNum #bind TF
-                    print "BIND!"
-                    if (i == tfToTrack):
-                        writeTFStatus(t + delta_t , i)
-                    if (clustering and uSitesNum):
-                        if (siteNum == nonClusterSiteToTrack):
-                            writeSiteStatus(t + delta_t , siteNum, False) # False for the non-cluster site
-                        elif (siteNum == clusterSiteToTrack):
-                            writeSiteStatus(t + delta_t , siteNum)
-                    else:
-                        if (siteNum == siteToTrack):
-                            writeSiteStatus(t + delta_t , siteNum)
+    numTFs = len(tfs)
+    while (i<numTFs):
+        siteNum = checkTFsiteCollision(tfs[i],bindSitesPosn)
+        if (siteNum != -1):
+            c = numpy.random.uniform(0.0,1.0)
+            if (c <= pBind):
+                bindSitesPosn[siteNum][3] = i #bind site
+                tfs[i][3] = siteNum #bind TF
+                print "BIND!"
+                if (i == tfToTrack):
+                    writeTFStatus(t + delta_t , i)
+                if (clustering and uSitesNum):
+                    if (siteNum == nonClusterSiteToTrack):
+                        writeSiteStatus(t + delta_t , siteNum, False) # False for the non-cluster site
+                    elif (siteNum == clusterSiteToTrack):
+                        writeSiteStatus(t + delta_t , siteNum)
+                else:
+                    if (siteNum == siteToTrack):
+                        writeSiteStatus(t + delta_t , siteNum)
                         
         i+=1
     return
