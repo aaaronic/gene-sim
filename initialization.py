@@ -6,7 +6,7 @@ import time
 
 import config as _conf
 from config import *
-from geneSimClasses import *
+import geneSimClasses as gs
 
 def checkCollision(newNode, existingNodes, nodeSize):
     sizeSquared = nodeSize**2 #avoid performing the same calculation repeatedly!
@@ -72,7 +72,7 @@ def checkDiffusionCollision(node, allNodes, allNodesPrev):
     #do nothing here now, yet... maybe never at all, since collisions between TFs are kind of irrevelant
     return
 
-def diffuseTFs(TFs,bindSites,dt,diffC):
+def diffuseTFs(TFs,dt,diffC):
     #treating each dimension as a gaussian probability of movement, with sigma = (2Dt)^.5
     sigma = (2*dt*(10**-6)*diffC)**.5 #The 10^-6 is due to dt being in _microseconds_
 
@@ -115,8 +115,9 @@ def iterate():
     global TFarray
     #TFarrayPrev = TFarray.copy() #dont think we need to know this at all, currently
     TFunbind()
-    unBoundTFs = filter(lambda x: x[3] != -1, TFarray)
-    diffuseTFs(unBoundTFs,bindSitesPosn,delta_t,TFdiffusionC)
+    unBoundTFs = filter(lambda x: x[3] == -1, TFarray)
+    return
+    diffuseTFs(unBoundTFs,delta_t,TFdiffusionC)
     TFbind(unBoundTFs)
     return
 
@@ -149,11 +150,12 @@ def TFunbind(): #allow TFs to become unbound based on their probability of doing
 def TFbind(tfs):
     i=0
     numTFs = len(tfs)
+    c = numpy.random.uniform(0.0,1.0, numTFs)
+    
     while (i<numTFs):
         siteNum = checkTFsiteCollision(tfs[i],bindSitesPosn)
         if (siteNum != -1):
-            c = numpy.random.uniform(0.0,1.0)
-            if (c <= pBind):
+            if (c[i] <= pBind):
                 bindSitesPosn[siteNum][3] = i #bind site
                 tfs[i][3] = siteNum #bind TF
                 print "BIND!"

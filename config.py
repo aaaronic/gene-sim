@@ -35,7 +35,7 @@ TFsize       = 10/3.0 # (nm)
 TFdiffusionC = 100 # (nm^2/s) this number and delta_t need to be set reasonably,
                      # so that collisions aren't very unlikely due to large displacements per timestep
                      # the mean displacement per timestep is (6*diff_C*delta_t)**0.5
-TFnumberInit = 10 # This is the number of TF molecules at system start
+TFnumberInit = 100 # This is the number of TF molecules at system start
 
 
 # Binding Site Parameters
@@ -49,7 +49,7 @@ pBind        = 1  # absolute probability [0,1]
 ## Probability of unbinding for a TF which within the volume of the binding
 ## site during a single time-step of the system.
 pUnbind      = (1.0 / (25.0 * (1.0 / (delta_t * 10**-6))))  # absolute probability [0,1] expressed this way, 25 seconds is the average bound time
-bindSitesNum = 10 # Number of binding sites in the system
+bindSitesNum = 100 # Number of binding sites in the system
 clustering   = True # whether or not binding sites should apppear in clusters
 ## probability of each placed binding site to be within the cluster (if enabled)
 clusterProbability = 0.8
