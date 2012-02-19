@@ -175,7 +175,7 @@ def TFbind(tfs):
 def checkTFsiteCollision(tf,bindSites):
     i=0
     while (i<len(bindSites)):
-        if (bindSitesPosn[siteNum][3] != -1): # ensure only unbound sites are considered for binding
+        if (bindSitesPosn[i][3] == -1): # ensure only unbound sites are considered for binding
             distSquared = (bindSites[i][0] - tf[0])**2 + (bindSites[i][1] - tf[1])**2 + (bindSites[i][2] - tf[2])**2
             if (distSquared <= bindDistanceSquared):
                 return i
