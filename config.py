@@ -13,7 +13,7 @@ seed = 6143 # any integer
 ## Delta_t of each step through the simulation
 delta_t       = 1000 # (micro-seconds)
 ## Duration of the simulation
-duration      = 600000 * delta_t # (either multiply delta_t or set a raw time - in microseconds)
+duration      = 200 * delta_t # (either multiply delta_t or set a raw time - in microseconds)
 #how often should we print out the current system status?
 printOutAt    = duration / (delta_t * 100) #(a raw number of timesteps into the simulation)
 #how often should we wite the system status to a file?
@@ -42,7 +42,8 @@ TFnumberInit = 100 # This is the number of TF molecules at system start
 ## This value is the size of binding sites; if they are cubes, this is the
 ## side length, and if they are spheres, this is their diameter.
 bindSize     = 10 # (nm)
-bindDistanceSquared = (bindSize+TFsize)**2 #for expediency of the simulation
+bindDistance = bindSize+TFsize
+bindDistanceSquared = bindDistance**2 #for expediency of the simulation
 ## Probability of binding for a TF which within the volume of the binding site
 ## during a single time-step of the system.
 pBind        = 1  # absolute probability [0,1]

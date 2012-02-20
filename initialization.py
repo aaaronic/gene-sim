@@ -20,9 +20,9 @@ def placeBindSites(bindSites, clusters=False, cSize=0, cProbability=0):
     i=0
     if clusters==False:
         while (i<len(bindSites)):
-            bindSites[i][0] = numpy.random.uniform(-maxX + TFsize/2.0,maxX-TFsize/2.0)
-            bindSites[i][1] = numpy.random.uniform(-maxY+TFsize/2.0,maxY-TFsize/2.0)
-            bindSites[i][2] = numpy.random.uniform(-maxZ+TFsize/2.0,maxZ-TFsize/2.0)
+            bindSites[i][0] = numpy.random.uniform(-maxX + bindSize/2.0,maxX-bindSize/2.0)
+            bindSites[i][1] = numpy.random.uniform(-maxY+bindSize/2.0,maxY-bindSize/2.0)
+            bindSites[i][2] = numpy.random.uniform(-maxZ+bindSize/2.0,maxZ-bindSize/2.0)
             bindSites[i][3] = -1 #all initially unbound
             bindSites[i][4] = False #none are in clusters here
             if not checkCollision(bindSites[i],bindSites[0:i],bindSize):
@@ -47,9 +47,9 @@ def placeBindSites(bindSites, clusters=False, cSize=0, cProbability=0):
             else:
                 placed = 0
                 while (placed==0):
-                    bindSites[i][0] = numpy.random.uniform(-maxX + TFsize/2.0,maxX-TFsize/2.0)
-                    bindSites[i][1] = numpy.random.uniform(-maxY+TFsize/2.0,maxY-TFsize/2.0)
-                    bindSites[i][2] = numpy.random.uniform(-maxZ+TFsize/2.0,maxZ-TFsize/2.0)
+                    bindSites[i][0] = numpy.random.uniform(-maxX + bindSize/2.0,maxX-bindSize/2.0)
+                    bindSites[i][1] = numpy.random.uniform(-maxY+bindSize/2.0,maxY-bindSize/2.0)
+                    bindSites[i][2] = numpy.random.uniform(-maxZ+bindSize/2.0,maxZ-bindSize/2.0)
                     bindSites[i][3] = -1 #all initially unbound
                     bindSites[i][4] = False #NOT in a cluster
                     if not checkCollision(bindSites[i],bindSites[0:i],bindSize):
@@ -112,12 +112,18 @@ def diffuseTFs(TFs,dt,diffC):
     return
 
 def iterate():
-    global TFarray
+    global TFarray, TFUnbindTimeTotal, TFBindTimeTotal, TFDiffusionTimeTotal
     #TFarrayPrev = TFarray.copy() #dont think we need to know this at all, currently
+    start = time.clock()
     TFunbind()
+    TFUnbindTimeTotal += time.clock() - start
     unBoundTFs = filter(lambda x: x[3] == -1, TFarray)
+    start = time.clock()
     diffuseTFs(unBoundTFs,delta_t,TFdiffusionC)
+    TFDiffusionTimeTotal += time.clock() - start
+    start = time.clock()
     TFbind(unBoundTFs)
+    TFBindTimeTotal += time.clock() - start
     return
 
 def TFunbind(): #allow TFs to become unbound based on their probability of doing so
@@ -147,12 +153,15 @@ def TFunbind(): #allow TFs to become unbound based on their probability of doing
     return
 
 def TFbind(tfs):
+    global collisionCheckingTimeTotal
     i=0
     numTFs = len(tfs)
     c = numpy.random.uniform(0.0,1.0, numTFs)
     
     while (i<numTFs):
+        start = time.clock()
         siteNum = checkTFsiteCollision(tfs[i],bindSitesPosn)
+        collisionCheckingTimeTotal += time.clock() - start
         if (siteNum != -1):
             if (c[i] <= pBind):
                 bindSitesPosn[siteNum][3] = i #bind site
@@ -174,11 +183,15 @@ def TFbind(tfs):
 
 def checkTFsiteCollision(tf,bindSites):
     i=0
-    while (i<len(bindSites)):
-        if (bindSitesPosn[i][3] == -1): # ensure only unbound sites are considered for binding
-            distSquared = (bindSites[i][0] - tf[0])**2 + (bindSites[i][1] - tf[1])**2 + (bindSites[i][2] - tf[2])**2
-            if (distSquared <= bindDistanceSquared):
-                return i
+    for s in bindSites:
+        if (s[3] == -1): # ensure only unbound sites are considered for binding
+            distSquared = (s[0] - tf[0])**2 #dx**2
+            if (distSquared < bindDistanceSquared): #check each coordinate individually before bothering to continue to the full comparison
+                distSquared += (s[1] - tf[1])**2 #dy**2
+                if (distSquared < bindDistanceSquared):
+                    distSquared += (s[2] - tf[2])**2
+                    if (distSquared <= bindDistanceSquared):
+                        return i
         i+=1
     return -1 #no collision
 
@@ -315,6 +328,11 @@ if (clustering and clusterProbability<1):
 writeConfig(systemFileOut)
 writeConfig(tfFileOut)
 writeConfig(bindSiteFileOut)
+
+TFBindTimeTotal = 0
+TFUnbindTimeTotal = 0
+TFDiffusionTimeTotal = 0
+collisionCheckingTimeTotal = 0
 
 t=0
 try:
