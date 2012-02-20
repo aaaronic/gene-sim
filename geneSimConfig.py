@@ -29,8 +29,6 @@ config.duration      = 200 * config.delta_t # (either multiply delta_t or set a 
 config.printOutAt    = config.duration / (config.delta_t * 100) #(a raw number of timesteps into the simulation)
 #how often should we wite the system status to a file?
 config.writeSysOutAt = 100 #(a raw number of timesteps into the simulation)
-#Prefix of the names of the files to output to (the timestamp of the run will also be included as a suffix)
-config.fileOut       = 'Spring2012_Data/tf10b100-20min_clus0.8-r1'
 ## Dimensions of the system as a whole.  These values are in nm!
 config.systemWidth   = 500 # x-axis (nm)
 config.systemLength  = 500 # y-axis (nm)
@@ -66,3 +64,6 @@ config.bindSitesNum = 100 # Number of binding sites in the system
 config.clusterProbability = 0.8 # a value of zero here turns off clustering behaviour completely
 ## side-length/diameter of the cluster region
 config.clusterSize = 3 * config.bindSize * config.bindSitesNum * config.clusterProbability # (nm)
+
+#Prefix of the names of the files to output to (the timestamp of the run will also be included as a suffix)
+config.fileOut       = 'Spring2012_Data/tf10b100-20min_clus0.8-r1'

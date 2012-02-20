@@ -12,3 +12,4 @@ if (__name__ == "__main__"):
     system = gs.Simulation(c.config)
     print "Beginning time evolution..."
     system.runSimulation()
+    system.closeFiles()

@@ -19,6 +19,9 @@ class BindingSite:
         self.boundTo=boundTo
         self.inCluster=inCluster
         self.file=None
+    
+    def __str__(self):
+        return str(self.x)+'\t'+str(self.y)+'\t'+str(self.z)+'\t'+'\t'+str(self.boundTo)
 
     def siteOverlap(self, otherSites):
         for site in otherSites:
@@ -308,16 +311,16 @@ class Simulation:
         # verbose is intended to mean write out the status of the entire system (as in all positions of
         # binding sites and tfs), but I'm not sure how to make that gnuplot-friendly...
         sysStats = self.calcGlobalStats()
-        if (time==0):
+        if (self.time==0):
             statsComment = '#timestamp(mu-s)'
-        statsValues = str(time)
+        statsValues = str(self.time)
         statNames = sysStats.keys()
         statNames.sort()
         for statName in statNames:
-            if (time==0):
+            if (self.time==0):
                 statsComment += ','+statName
             statsValues += '\t'+str(sysStats[statName])
-        if (time==0):
+        if (self.time==0):
             self.fileOut.write(statsComment+'\n')
         self.fileOut.write(statsValues+'\n')
     
@@ -349,6 +352,16 @@ class Simulation:
         stats['tfmu-z'] = tfz / tfNum
         return stats
         #to output results, x = calcGlobalStats(); for i in x {print str(i)+':' + str(x[i])}
+    
+    def closeFiles(self):
+        for tf in self.tfs:
+            if (tf.file is not None):
+                tf.file.close()
+        for site in self.sites:
+            if (site.file is not None):
+                site.file.close()
+        if (self.fileOut is not None):
+            self.fileOut.close()
 
 
 
