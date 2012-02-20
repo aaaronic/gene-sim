@@ -70,7 +70,7 @@ class TF:
     
     def checkTFsiteCollision(self, bindSites, bindDistanceSquared):
         for s in bindSites:
-            if (s.boundTo is not None): # ensure only unbound sites are considered for binding
+            if (s.boundTo is None): # ensure only unbound sites are considered for binding
                 distSquared = (s.x - self.x)**2
                 if (distSquared < bindDistanceSquared): #check each coordinate individually before bothering to continue to the full comparison
                     distSquared += (s.y - self.y)**2 #dy**2
