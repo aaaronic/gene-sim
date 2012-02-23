@@ -142,10 +142,16 @@ class Simulation:
                 if (not site.siteOverlap(self.sites)):
                     self.sites.append(site)
                     i+=1 #now we've placed it and can move on to the next one
-            siteToTrack = np.random.randint(len(self.sites))
-            self.sites[siteToTrack].file = open(self.config.fileOut+'-bindingSite-'+str(siteToTrack)+'-'+self.timestamp,'w',0)
-            self.writeConfig(self.sites[siteToTrack].file)
-            self.sites[siteToTrack].writeStatus(0, len(self.sites))
+            if (self.config.trackAllSites):
+                for site in self.sites:
+                    site.file = open(self.config.fileOut+'-'+self.timestamp+'-bindingSite_'+str(site.siteNum),'w',0)
+                    self.writeConfig(site.file)
+                    site.writeStatus(0, len(self.sites))
+            else:
+                siteToTrack = np.random.randint(len(self.sites))
+                self.sites[siteToTrack].file = open(self.config.fileOut+'-'+self.timestamp+'-bindingSite_'+str(siteToTrack),'w',0)
+                self.writeConfig(self.sites[siteToTrack].file)
+                self.sites[siteToTrack].writeStatus(0, len(self.sites))
         else:
             clusterX = np.random.uniform(-maxX + config.clusterSize/2.0,maxX-config.clusterSize/2.0)
             clusterY = np.random.uniform(-maxY + config.clusterSize/2.0,maxY-config.clusterSize/2.0)
@@ -178,18 +184,27 @@ class Simulation:
                             self.sites.append(site)
                             placed=True
                 i+=1
-            c = True
-            while (c):
-                siteToTrack = np.random.randint(len(self.sites))
-                c = self.sites[siteToTrack].inCluster #we found one not it a cluster that we'll be tracking
-            self.sites[siteToTrack].file = open(self.config.fileOut+'-bindingSite-'+str(siteToTrack)+'-nonCluster-'+self.timestamp,'w',0)
-            self.writeConfig(self.sites[siteToTrack].file)
-            self.sites[siteToTrack].writeStatus(0, len(self.sites))
-
-            clusterSiteToTrack = self.cluster.sites[np.random.randint(len(self.cluster.sites))].siteNum
-            self.sites[clusterSiteToTrack].file = open(self.config.fileOut+'-bindingSite-'+str(siteToTrack)+'-inCluster-'+self.timestamp,'w',0)
-            self.writeConfig(self.sites[clusterSiteToTrack].file)
-            self.sites[clusterSiteToTrack].writeStatus(0, len(self.sites))
+            if (self.config.trackAllSites):
+                for site in self.sites:
+                    cStatus = "FreeSite"
+                    if site.inCluster:
+                        cStatus = "ClusterSite"
+                    site.file = open(self.config.fileOut+'-'+self.timestamp+'-'+cStatus+'_'+str(site.siteNum),'w',0)
+                    self.writeConfig(site.file)
+                    site.writeStatus(0, len(self.sites))
+            else:
+                c = True
+                while (c):
+                    siteToTrack = np.random.randint(len(self.sites))
+                    c = self.sites[siteToTrack].inCluster #we found one not it a cluster that we'll be tracking
+                self.sites[siteToTrack].file = open(self.config.fileOut+'-bindingSite-'+str(siteToTrack)+'-nonCluster-'+self.timestamp,'w',0)
+                self.writeConfig(self.sites[siteToTrack].file)
+                self.sites[siteToTrack].writeStatus(0, len(self.sites))
+    
+                clusterSiteToTrack = self.cluster.sites[np.random.randint(len(self.cluster.sites))].siteNum
+                self.sites[clusterSiteToTrack].file = open(self.config.fileOut+'-bindingSite-'+str(siteToTrack)+'-inCluster-'+self.timestamp,'w',0)
+                self.writeConfig(self.sites[clusterSiteToTrack].file)
+                self.sites[clusterSiteToTrack].writeStatus(0, len(self.sites))
         print "TF's and Binding Sites now in place."
 
         print "Binding Sites are fixed at the following locations:"
@@ -239,7 +254,6 @@ class Simulation:
         for tf in tfs:
             site = tf.checkTFsiteCollision(self.sites,self.config.bindDistanceSquared)
             if (site is not None):
-                print "tf-site collision"
                 if (c[i] <= self.config.pBind):
                     site.boundTo = tf #bind site
                     tf.boundTo = site #bind TF
@@ -423,6 +437,7 @@ class Config:
         self.bindSize     = 10 # (nm)
         self.bindDistance = self.bindSize + self.TFsize
         self.bindDistanceSquared = self.bindDistance**2 #for expediency of the simulation
+        self.trackAllSites = False # when this is True, we track every site, not just in inside and one outside a cluster
         ## Probability of binding for a TF which within the volume of the binding site
         ## during a single time-step of the system.
         self.pBind        = 1  # absolute probability [0,1]

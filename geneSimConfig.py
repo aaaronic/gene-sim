@@ -53,6 +53,7 @@ config.TFnumberInit = 10 # This is the number of TF molecules at system start
 config.bindSize     = 10 # (nm)
 config.bindDistance = config.bindSize + config.TFsize
 config.bindDistanceSquared = config.bindDistance**2 #for expediency of the simulation
+config.trackAllSites = True
 ## Probability of binding for a TF which within the volume of the binding site
 ## during a single time-step of the system.
 config.pBind        = 1  # absolute probability [0,1]
