@@ -63,7 +63,7 @@ config.bindSitesNum = 100 # Number of binding sites in the system
 ## probability of each placed binding site to be within the cluster (if enabled)
 config.clusterProbability = 0.8 # a value of zero here turns off clustering behaviour completely
 ## side-length/diameter of the cluster region
-config.clusterSize = 3 * config.bindSize * config.bindSitesNum * config.clusterProbability # (nm)
+config.clusterSize = 3 * config.bindSize * (config.bindSitesNum)**(1/3.) * config.clusterProbability # (nm)
 
 #Prefix of the names of the files to output to (the timestamp of the run will also be included as a suffix)
 config.fileOut       = 'Spring2012_Data/tf10b100-30min_clus0.8-r1'

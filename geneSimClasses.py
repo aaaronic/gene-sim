@@ -152,7 +152,8 @@ class Simulation:
             clusterZ = np.random.uniform(-maxZ + config.clusterSize/2.0,maxZ-config.clusterSize/2.0)
             self.cluster = SiteCluster(config.clusterSize, (clusterX, clusterY, clusterZ))
             print "Running With with a clusterprobability of " + str(config.clusterProbability)
-            print "Cluster centered at:\n" + str(self.cluster.x)+','+str(self.cluster.y)+','+str(self.cluster.z)
+            self.fileOut.write("# Cluster centered at:\n" + str(clusterX)+','+str(clusterY)+','+str(clusterZ)+"\n\n")
+            print "Cluster centered at:\n" + str(clusterX)+','+str(clusterY)+','+str(clusterZ)
             while (i<config.bindSitesNum):
                 rand = np.random.uniform(0,1)
                 if (rand <= config.clusterProbability): #we place this one in a cluster!
@@ -238,6 +239,7 @@ class Simulation:
         for tf in tfs:
             site = tf.checkTFsiteCollision(self.sites,self.config.bindDistanceSquared)
             if (site is not None):
+                print "tf-site collision"
                 if (c[i] <= self.config.pBind):
                     site.boundTo = tf #bind site
                     tf.boundTo = site #bind TF
@@ -431,4 +433,4 @@ class Config:
         ## probability of each placed binding site to be within the cluster (if enabled)
         self.clusterProbability = 0.8 # a value of zero here turns off clustering behaviour completely
         ## side-length/diameter of the cluster region
-        self.clusterSize = 3 * self.bindSize * self.bindSitesNum * self.clusterProbability # (nm)
+        self.clusterSize = 3 * self.bindSize * ((self.bindSitesNum)**(1/3.)) * self.clusterProbability # (nm)
