@@ -76,7 +76,7 @@ class TF:
             if (s.boundTo is None): # ensure only unbound sites are considered for binding
                 distSquared = (s.x - self.x)**2
                 if (distSquared < bindDistanceSquared): #check each coordinate individually before bothering to continue to the full comparison
-                    distSquared += (s.y - self.y)**2 #dy**2
+                    distSquared += (s.y - self.y)**2
                     if (distSquared < bindDistanceSquared):
                         distSquared += (s.z - self.z)**2
                         if (distSquared <= bindDistanceSquared):
@@ -229,19 +229,21 @@ class Simulation:
 
     def bindTFs(self, tfs):
         i=0
-        c = np.random.uniform(0.0,1.0, len(tfs))
+        
+        if (self.config.pBind == 1):
+            c = np.random.uniform(1,1, len(tfs))
+        else:
+            c = np.random.uniform(0,1, len(tfs))
         
         for tf in tfs:
             site = tf.checkTFsiteCollision(self.sites,self.config.bindDistanceSquared)
             if (site is not None):
                 if (c[i] <= self.config.pBind):
                     site.boundTo = tf #bind site
-                    tf = site #bind TF
+                    tf.boundTo = site #bind TF
                     print "BIND!"
-                    if (tf.file is not None):
-                        self.writeTFStatus(self.time + self.config.delta_t, tf)
-                    if (site.file is not None):
-                        self.writeSiteStatus(self.time + self.config.delta_t, site)
+                    tf.writeStatus(self.time + self.config.delta_t, 0)
+                    site.writeStatus(self.time + self.config.delta_t, 0)
             i+=1
 
     def unbindTFs(self):
@@ -255,10 +257,8 @@ class Simulation:
                     tf.boundTo.boundTo = None
                     tf.boundTo = None
                     print "UNBIND!"
-                    if (tf.file is not None):
-                        self.writeTFStatus(self.time + self.config.delta_t, tf)
-                    if (site.file is not None):
-                            self.writeSiteStatus(self.time + self.config.delta_t, site)
+                    tf.writeStatus(self.time + self.config.delta_t, 0)
+                    site.writeStatus(self.time + self.config.delta_t, 0)
             i+=1
     
     def diffuseTFs(self, tfs):
