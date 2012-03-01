@@ -36,7 +36,7 @@ class BindingSite:
                 comment = '#Site being tracked: #'+str(self.siteNum)+' (of '+str(numSites)+')\n'
                 comment += '#located at position: '+str(self.x)+'\t'+str(self.y)+'\t'+str(self.z)+'\n'
                 if (self.inCluster):
-                    comment += 'site is within a cluster'
+                    comment += '\n#site is within a cluster\n'
                 comment += '#timestamp(mu-s),status(0/1 for unbound/bound),boundTo(None means unbound!)'
                 self.file.write(comment+'\n')
             tfNum = -1
@@ -158,7 +158,7 @@ class Simulation:
             clusterZ = np.random.uniform(-maxZ + config.clusterSize/2.0,maxZ-config.clusterSize/2.0)
             self.cluster = SiteCluster(config.clusterSize, (clusterX, clusterY, clusterZ))
             print "Running With with a clusterprobability of " + str(config.clusterProbability)
-            self.fileOut.write("# Cluster centered at:\n" + str(clusterX)+','+str(clusterY)+','+str(clusterZ)+"\n\n")
+            self.fileOut.write("# Cluster centered at:\n#" + str(clusterX)+','+str(clusterY)+','+str(clusterZ)+"\n\n")
             print "Cluster centered at:\n" + str(clusterX)+','+str(clusterY)+','+str(clusterZ)
             while (i<config.bindSitesNum):
                 rand = np.random.uniform(0,1)

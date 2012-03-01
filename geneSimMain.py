@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Feb 19 21:04:55 2012
+
+@author: Ahaarnos
+"""
+
 #Perform some initial setup
 #import numpy
 #import scipy

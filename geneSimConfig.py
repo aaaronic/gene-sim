@@ -17,7 +17,7 @@ config = gs.Config();
 # This is the seed for the random number generator.  Each run's sequence of
 # random numbers is completely determined by this variable.  This enables us
 # to run multiple runs with the same sequence of random numbers.
-config.seed = 6483 # any integer
+config.seed = 13 # any integer
 #numpy.random.randint(100000000) is a good way to get a new one (higher than 4 billion is unadvisable).
 
 # System-as-a-whole parameters
@@ -44,7 +44,7 @@ config.TFsize       = 10/3.0 # (nm)
 config.TFdiffusionC = 100 # (nm^2/s) this number and delta_t need to be set reasonably,
                      # so that collisions aren't very unlikely due to large displacements per timestep
                      # the mean displacement per timestep is (6*diff_C*delta_t)**0.5
-config.TFnumberInit = 10 # This is the number of TF molecules at system start
+config.TFnumberInit = 100 # This is the number of TF molecules at system start
 
 
 # Binding Site Parameters
@@ -67,4 +67,4 @@ config.clusterProbability = 0.8 # a value of zero here turns off clustering beha
 config.clusterSize = 3 * config.bindSize * (config.bindSitesNum)**(1/3.) * config.clusterProbability # (nm)
 
 #Prefix of the names of the files to output to (the timestamp of the run will also be included as a suffix)
-config.fileOut       = 'Spring2012_Data/tf10b100-30min_clus0.8-r1'
+config.fileOut       = 'Spring2012_Data/tf100b100-30min_clus0.8_r1/'
