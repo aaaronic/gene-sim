@@ -123,22 +123,66 @@ class Site:
         
 #Do all of the above per-ensemble, and for the sum of common ensembles
 
-folders = ["../Spring2012_Data/tf10b100-30min_clus0.8_r1",
-           "../Spring2012_Data/tf10b100-30min_clus0.8_r2",
-           "../Spring2012_Data/tf10b100-30min_clus0.8_r3",
-           "../Spring2012_Data/tf10b100-30min_clus0.8_r4",
-           "../Spring2012_Data/tf10b100-30min_clus0.8_r5"]
+folders = ["../Spring2012_Data/tf100b100-30min_clus0.8_r1",
+           "../Spring2012_Data/tf100b100-30min_clus0.8_r2",
+           "../Spring2012_Data/tf100b100-30min_clus0.8_r3"]
 
 print "Setting up the system"
 system = RunSet(folders)
 
 print "Beginning statistics calculations per-run"
 
-#draw the histogram
-
-
-
 print "Beginning stas calc for the whole system"
+
+#draw the histogram
+fig = plt.figure()
+ax = fig.add_subplot(111)
+
+data = []
+
+for run in system.runs:
+    for site in run.sites:
+        data += site.bindDurations
+
+ax.hist(data, 75, facecolor='green', alpha=0.75)
+
+ax.set_xlabel("Binding Duration")
+
+#plt.show()
+
+total = 0.
+for d in data:
+    total += d
+    
+print total / len(data)
+
+
+clusterPercentages = []
+freePercentages = []
+
+for run in system.runs:
+    for site in run.sites:
+        if site.inCluster:
+            clusterPercentages.append((site.totalBoundTime + 0.0) / run.duration)
+        else:
+            freePercentages.append((site.totalBoundTime + 0.0) / run.duration)
+            
+totalPercentages = freePercentages + clusterPercentages
+
+#draw the histogram
+fig = plt.figure()
+ax = fig.add_subplot(111)
+
+data = []
+
+for run in system.runs:
+    for site in run.sites:
+        data += site.bindDurations
+
+ax.hist(clusterPercentages, 75, facecolor='red', alpha=0.75)
+
+ax.set_xlabel("% Bound (of total Simulation)")
+
 
 """
 for a list of folders corresponding to the same config:
